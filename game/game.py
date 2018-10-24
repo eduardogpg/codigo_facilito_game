@@ -66,7 +66,7 @@ class Game:
         hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
         if hits:
             self.player.validate_move(hits[0])
-            
+
 
 class Music:
     def __init__(self):
