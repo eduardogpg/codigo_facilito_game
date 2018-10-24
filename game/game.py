@@ -25,8 +25,8 @@ class Game:
         self.run()
 
     def elements(self):
-        self.player = Player(WIDHT / 5, HEIGHT - 40)
         self.platform = Platform(0, HEIGHT - 40, WIDHT, 40, GREEN)
+        self.player = Player(WIDHT / 5, self.platform.rect.top)
 
         p1 = Platform(500, HEIGHT - 80, 40, 40, BROWN)
         p2 = Platform(0, HEIGHT - 80, 40, 40, BROWN)
@@ -43,15 +43,15 @@ class Game:
     def run(self):
         while self.playing:
             self.clock.tick(FPS)
-            self.update()
             self.draw()
+            self.update()
             self.events()
 
     def draw(self):
         self.display.fill(BLACK)
         self.sprites.draw(self.display)
 
-        pygame.display.flip()
+        pygame.display.update()
 
     def events(self):
         for event in pygame.event.get():
@@ -59,14 +59,14 @@ class Game:
                 self.playing = False
 
     def update(self):
-        self.player.rect.bottom += 1
-
-        hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
-        if hits:
-            self.player.validate_move(hits[0])
-
-        self.player.rect.bottom -= 1
         self.sprites.update()
+
+        if self.player.is_jump:
+            self.player.rect.bottom += 2
+            hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
+            if hits:
+                self.player.validate_move(hits[0])
+
 
 class Music:
     def __init__(self):

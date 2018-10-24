@@ -14,9 +14,8 @@ BROWN = (54,40,18)
 PLAYER_FRICTION = -0.12
 MASS = 2
 
-SPEED_X = 5
-SPEED_Y = 8
-GRAVITY = 0.8
+ACC_Y = 8
+VEL_X = 5
 
 LEFT = 'left'
 RIGHT = 'right'

@@ -15,7 +15,11 @@ class Player(pygame.sprite.Sprite):
 
         self.is_jump = False
         self.mass = MASS
-        self.speed_y = SPEED_Y
+        self.acc_y = ACC_Y
+
+        self.vel_x = VEL_X
+
+        print(self.rect.bottom)
 
     def left(self):
         self.acc_x -= self.speed_x
@@ -26,28 +30,40 @@ class Player(pygame.sprite.Sprite):
         self.direction = RIGHT
 
     def validate_move(self, object):
-        print("Siii")
         if self.is_jump:
             self.is_jump = False
-            self.speed_y = SPEED_Y
-            self.rect.bottom = object.rect.top + 2
+            self.acc_y = ACC_Y
+            self.rect.bottom = object.rect.top
+            
 
     def jump(self):
         self.is_jump = True
 
+    def left(self):
+        self.rect.left -= self.vel_x
+
+    def right(self):
+        self.rect.right += self.vel_x
+
     def calculate_acc(self):
         if self.is_jump:
-            F = (0.5 * self.mass * (self.speed_y * self.speed_y))
-            if self.speed_y <= 0:
+            F = (0.5 * self.mass * (self.acc_y * self.acc_y))
+            if self.acc_y <= 0:
                 F = F * -1
 
-            self.rect.y = self.rect.y - F
-            self.speed_y = self.speed_y - 1
+            self.rect.bottom = abs(self.rect.bottom - F)
+            self.acc_y = self.acc_y - 1
 
     def update(self):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_SPACE]:
             self.jump()
+
+        if keys[pygame.K_LEFT]:
+            self.left()
+
+        if keys[pygame.K_RIGHT]:
+            self.right()
 
         self.calculate_acc()
