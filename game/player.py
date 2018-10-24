@@ -13,6 +13,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.left = left
         self.rect.bottom = bottom
 
+        self.direction = ''
         self.is_jump = False
         self.mass = MASS
         self.acc_y = ACC_Y
@@ -30,29 +31,34 @@ class Player(pygame.sprite.Sprite):
         self.direction = RIGHT
 
     def validate_move(self, object):
-        if self.is_jump:
-            self.is_jump = False
-            self.acc_y = ACC_Y
-            self.rect.bottom = object.rect.top
-            
+        print("Si")
+
+        if self.direction == LEFT:
+            self.rect.left = object.rect.right
+
+        if self.direction == RIGHT:
+            self.rect.right = object.rect.left
+
+        self.direction = ''
+
 
     def jump(self):
         self.is_jump = True
 
     def left(self):
         self.rect.left -= self.vel_x
+        self.direction = LEFT
 
     def right(self):
         self.rect.right += self.vel_x
+        self.direction = RIGHT
 
     def calculate_acc(self):
         if self.is_jump:
-            F = (0.5 * self.mass * (self.acc_y * self.acc_y))
-            if self.acc_y <= 0:
-                F = F * -1
+            pass
 
-            self.rect.bottom = abs(self.rect.bottom - F)
-            self.acc_y = self.acc_y - 1
+    def calculdate_fall(self):
+        self.rect.bottom += 4
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -67,3 +73,4 @@ class Player(pygame.sprite.Sprite):
             self.right()
 
         self.calculate_acc()
+        self.calculdate_fall()
