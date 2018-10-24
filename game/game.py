@@ -20,32 +20,30 @@ class Game:
     def new(self):
         self.playing = True
         self.sprites = pygame.sprite.Group()
-        self.obstacles = pygame.sprite.Group()
+        self.platforms = pygame.sprite.Group()
 
         self.elements()
         self.run()
 
     def elements(self):
         self.platform = Platform()
-        self.player = Player(WIDHT / 5, self.platform.rect.top)
+        self.player = Player(WIDHT / 6, self.platform.rect.top)
 
         p1 = Obstacle(500, HEIGHT - 80, 40, 40)
-        p2 = Obstacle(0, HEIGHT - 80, 40, 40)
 
         self.sprites.add(self.player)
         self.sprites.add(self.platform)
         self.sprites.add(p1)
-        self.sprites.add(p2)
 
-        self.obstacles.add(p1)
-        self.obstacles.add(p2)
+        self.platforms.add(p1)
+        self.platforms.add(self.platform)
 
     def run(self):
         while self.playing:
             self.clock.tick(FPS)
-            self.draw()
-            self.update()
             self.events()
+            self.update()
+            self.draw()
 
     def draw(self):
         self.display.fill(BLACK)
@@ -58,18 +56,16 @@ class Game:
             if event.type == pygame.QUIT:
                 self.playing = False
 
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            self.player.left()
+
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.player.right()
+
+        if keys[pygame.K_SPACE]:
+            self.player.jump()
+
     def update(self):
         self.sprites.update()
-
-        #collide with platform
-        hit = pygame.sprite.collide_rect(self.player, self.platform)
-        if hit:
-            self.player.rect.bottom = self.platform.rect.top
-
-        hits = pygame.sprite.spritecollide(self.player, self.obstacles, False)
-        if(hits):
-            self.player.validate_move(hits[0])
-
-class Music:
-    def __init__(self):
-        pass

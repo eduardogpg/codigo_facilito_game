@@ -1,10 +1,8 @@
-from pygame.math import Vector2
-
 WIDHT = 600
 HEIGHT = 400
 
 TITLE = 'Facilito game'
-FPS = 30
+FPS = 60
 
 BLACK = (0, 0, 0)
 GREEN = (69,184,61)
@@ -12,12 +10,12 @@ RED = (184,61,88)
 BROWN = (54,40,18)
 
 PLAYER_FRICTION = -0.12
-MASS = 2
-
-ACC_Y = 8
-VEL_X = 5
 
 LEFT = 'left'
 RIGHT = 'right'
 UP = 'up'
 DOWN = 'down'
+
+PLAYER_GRA = 0.1
+PLAYER_ACC = 0.5
+PLAYER_FRICTION = -0.12
