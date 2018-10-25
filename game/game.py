@@ -27,7 +27,7 @@ class Game:
 
     def elements(self):
         self.platform = Platform()
-        self.player = Player(WIDHT / 6, self.platform.rect.top)
+        self.player = Player(WIDHT / 6, 300)
 
         p1 = Obstacle(500, HEIGHT - 80, 40, 40)
 
@@ -69,3 +69,8 @@ class Game:
 
     def update(self):
         self.sprites.update()
+
+        if self.player.is_falling():
+            self.player.validate_landing(self.platforms)
+
+        self.player.validate_jump(self.platforms)

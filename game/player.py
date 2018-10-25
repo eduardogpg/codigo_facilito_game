@@ -15,17 +15,42 @@ class Player(pygame.sprite.Sprite):
 
         self.direction = ''
 
+        self.vel_y = 0
+        self.pos_y = 0
+
+        self.can_jump = False
+
     def left(self):
-        self.rect.left -= 5
-
-    def right(self):
-        self.rect.left += 5
-
-    def jump(self):
-        self.is_jump = True
-        
-    def fall(self):
         pass
 
+    def right(self):
+        pass
+
+    def jump(self):
+        if self.can_jump:
+            self.vel_y -= 20
+            self.can_jump = False
+
+    def validate_jump(self, platforms):
+        self.rect.y -= 1
+
+        hits = pygame.sprite.spritecollide(self, platforms, False)
+        if hits:
+            self.can_jump = True
+
+        self.rect.y += 1
+
+    def is_falling(self):
+        return self.vel_y > 0
+
+    def validate_landing(self, platforms):
+        hits = pygame.sprite.spritecollide(self, platforms, False)
+        if hits:
+            self.pos_y = hits[0].rect.top
+            self.vel_y = 0
+
     def update(self):
-        self.fall()
+        self.vel_y += PLAYER_GRAV
+        self.pos_y += self.vel_y + 0.5 * PLAYER_GRAV
+
+        self.rect.bottom = self.pos_y
