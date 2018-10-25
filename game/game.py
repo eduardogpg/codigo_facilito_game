@@ -5,6 +5,7 @@ from .config import *
 from .player import Player
 from .platform import Platform
 from .wall import Wall
+from .coin import Coin
 
 class Game:
 
@@ -35,13 +36,27 @@ class Game:
 
         self.sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
+        self.coins = pygame.sprite.Group()
 
         self.sprites.add(self.player)
         self.sprites.add(self.platform)
 
         self.las_position_wall = WIDHT + 200
+        self.las_position_coin = WIDHT + 100
 
         self.generate_walls()
+        self.generate_coins()
+
+    def generate_coins(self):
+        if len(self.coins) < 10:
+
+            pos_x = random.randrange(self.las_position_coin + 200,
+                                     self.las_position_coin + 400)
+            coin = Coin(pos_x, 200)
+
+            self.sprites.add(coin)
+            self.coins.add(coin)
+            self.las_position_coin = coin.rect.right
 
     def generate_walls(self):
         if len(self.walls) < 6:
@@ -90,19 +105,26 @@ class Game:
         self.player.validate_platform(self.platform)
 
         self.update_text()
-        self.update_walls()
+        self.update_elements(self.walls)
+        self.update_elements(self.coins)
+
+        coin = self.player.collide_with(self.coins)
+        if coin:
+            self.update_score()
+            coin.kill()
 
         if self.player.collide_with(self.walls):
             self.stop()
 
-    def update_walls(self):
-        for wall in self.walls:
-            wall.set_vel_x(self.vel_x)
-
-            if not wall.visible():
-                wall.kill()
-
         self.generate_walls()
+        self.generate_coins()
+
+    def update_elements(self, elements):
+        for element in elements:
+            element.set_vel_x(self.vel_x)
+
+            if not element.visible():
+                element.kill()
 
     def update_score(self):
         self.score += 1

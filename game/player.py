@@ -34,7 +34,8 @@ class Player(pygame.sprite.Sprite):
 
     def collide_with(self, sprites):
         hits = pygame.sprite.spritecollide(self, sprites, False)
-        return hits
+        if hits:
+            return hits[0]
 
     def stop(self):
         self.playing = False

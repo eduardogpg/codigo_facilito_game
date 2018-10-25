@@ -2,7 +2,7 @@ import pygame
 
 from .config import *
 
-class Wall(pygame.sprite.Sprite):
+class Coin(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         pygame.sprite.Sprite.__init__(self)
 
@@ -15,10 +15,13 @@ class Wall(pygame.sprite.Sprite):
 
         self.acc_w = WALL_SPEED
 
-        self.jumped = False
+        self.vel_x = 0
 
     def update(self):
-        self.rect.left -= self.acc_w
+        self.rect.left -= self.vel_x
 
-    def stop(self):
-        self.acc_y = 0
+    def set_vel_x(self, vel_x):
+        self.vel_x = vel_x
+
+    def visible(self):
+        return self.rect.right > 0
