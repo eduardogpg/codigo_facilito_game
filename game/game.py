@@ -18,15 +18,16 @@ class Game:
 
         self.running = True
         self.score = 0
+        self.vel_x = WALL_SPEED
 
     def new(self):
         self.playing = True
 
-        self.elements()
+        self.generate_elements()
         self.run()
 
-    def elements(self):
-        self.fonts()
+    def generate_elements(self):
+        self.generate_fonts()
         self.update_text()
 
         self.platform = Platform()
@@ -54,8 +55,7 @@ class Game:
             self.walls.add(wall)
             self.las_position_wall = wall.rect.right
 
-
-    def fonts(self):
+    def generate_fonts(self):
         font = pygame.font.match_font('arial')
         self.font = pygame.font.Font(font, 28)
 
@@ -87,33 +87,35 @@ class Game:
     def update(self):
         self.sprites.update()
 
-        self.player.validate_landing(self.platform)
+        self.player.validate_platform(self.platform)
 
-        self.monitor_walls()
         self.update_text()
+        self.update_walls()
+
+        if self.player.collide_with(self.walls):
+            self.stop()
+
+    def update_walls(self):
+        for wall in self.walls:
+            wall.set_vel_x(self.vel_x)
+
+            if not wall.visible():
+                wall.kill()
 
         self.generate_walls()
-
-
-    def monitor_walls(self):
-        for wall in self.walls:
-            if not wall.jumped and self.player.pass_wall(wall):
-                self.update_score()
-                wall.jumped = True
-
-            if wall.rect.left <= -10:
-                wall.kill()
 
     def update_score(self):
         self.score += 1
 
-    def score_text(self):
-        return "Score : {} ".format(self.score)
-
     def update_text(self):
         self.text = self.font.render(self.score_text(), True, WHITE)
+
         self.text_rect = self.text.get_rect()
         self.text_rect.midtop = (WIDHT / 2, 10)
 
+    def score_text(self):
+        return "Score : {} ".format(self.score)
+
     def stop(self):
-        pass
+        self.vel_x = 0
+        self.player.stop()

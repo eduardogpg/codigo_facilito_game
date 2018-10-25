@@ -13,12 +13,13 @@ class Wall(pygame.sprite.Sprite):
         self.rect.x = pos_x
         self.rect.y = pos_y - 100
 
-        self.acc_w = WALL_SPEED
-
-        self.jumped = False
+        self.vel_x = 0
 
     def update(self):
-        self.rect.left -= self.acc_w
+        self.rect.left -= self.vel_x
 
-    def stop(self):
-        self.acc_y = 0
+    def set_vel_x(self, vel_x):
+        self.vel_x = vel_x
+
+    def visible(self):
+        return self.rect.right > 0

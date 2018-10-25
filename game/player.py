@@ -18,33 +18,32 @@ class Player(pygame.sprite.Sprite):
         self.acc_y = PLAYER_GRAV
 
         self.can_jump = False
-        self.live = True
+        self.playing = True
 
     def jump(self):
         if self.can_jump:
             self.vel_y = -25
             self.can_jump = False
 
-    def validate_landing(self, platform):
+    def validate_platform(self, platform):
         collide = pygame.sprite.collide_rect(self, platform)
         if collide:
             self.vel_y = 0
             self.pos_y = platform.rect.top
             self.can_jump = True
 
-    def validate_wall(self, walls):
-        walls = pygame.sprite.spritecollide(self, walls, False)
-        if walls:
-            self.live = False
-            print("Stop")
+    def collide_with(self, sprites):
+        hits = pygame.sprite.spritecollide(self, sprites, False)
+        return hits
 
-        return self.live
+    def stop(self):
+        self.playing = False
 
-    def pass_wall(self, wall):
-        return wall.rect.left < self.rect.left
-
-    def update(self):
-        self.vel_y += self.acc_y #Siempre en caida
+    def update_pos(self):
+        self.vel_y += self.acc_y #always falling
         self.pos_y += self.vel_y + 0.5 * self.acc_y
 
-        self.rect.bottom = self.pos_y
+    def update(self):
+        if self.playing:
+            self.update_pos()
+            self.rect.bottom = self.pos_y
