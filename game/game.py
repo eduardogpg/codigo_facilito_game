@@ -68,9 +68,16 @@ class Game:
             self.player.jump()
 
     def update(self):
+
         self.sprites.update()
 
         if self.player.is_falling():
             self.player.validate_landing(self.platforms)
 
+        self.player.validate_border()
         self.player.validate_jump(self.platforms)
+
+        if self.player.is_running():
+            self.player.validate_acc_x(self.platforms)
+
+        
