@@ -18,11 +18,13 @@ class Player(pygame.sprite.Sprite):
         self.acc_y = PLAYER_GRAV
 
         self.can_jump = False
+        self.jumpping = False
         self.playing = True
 
     def jump(self):
         if self.can_jump:
             self.vel_y = -25
+            self.jumpping = True
             self.can_jump = False
 
     def validate_platform(self, platform):
@@ -31,12 +33,24 @@ class Player(pygame.sprite.Sprite):
             self.vel_y = 0
             self.pos_y = platform.rect.top
             self.can_jump = True
+            self.jumpping = False
 
     def collide_with(self, sprites):
         hits = pygame.sprite.spritecollide(self, sprites, False)
         if hits:
             return hits[0]
 
+    def collide_bottom(self, wall):
+        self.rect.x -= 1
+        collide = pygame.sprite.collide_rect(self, wall)
+        self.rect.x += 1
+
+        return collide
+
+    def skid(self, wall):
+        self.pos_y = wall.rect.top
+        self.vel_y = 0
+        
     def stop(self):
         self.playing = False
 

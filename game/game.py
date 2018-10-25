@@ -113,8 +113,12 @@ class Game:
             self.update_score()
             coin.kill()
 
-        if self.player.collide_with(self.walls):
-            self.stop()
+        wall = self.player.collide_with(self.walls)
+        if wall:
+            if not self.player.collide_bottom(wall):
+                self.stop()
+
+            self.player.skid(wall)
 
         self.generate_walls()
         self.generate_coins()
