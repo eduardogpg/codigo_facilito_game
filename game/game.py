@@ -1,9 +1,10 @@
 import pygame
+import random
 
 from .config import *
-from .platform import Platform
 from .player import Player
-from .obstacle import Obstacle
+from .platform import Platform
+from .wall import Wall
 
 class Game:
 
@@ -16,27 +17,47 @@ class Game:
         self.clock =  pygame.time.Clock()
 
         self.running = True
+        self.score = 0
 
     def new(self):
         self.playing = True
-        self.sprites = pygame.sprite.Group()
-        self.platforms = pygame.sprite.Group()
 
         self.elements()
         self.run()
 
     def elements(self):
-        self.platform = Platform()
-        self.player = Player(WIDHT / 6, 300)
+        self.fonts()
+        self.update_text()
 
-        p1 = Obstacle(500, HEIGHT - 80, 40, 40)
+        self.platform = Platform()
+        self.player = Player(100, self.platform.rect.top - 200)
+
+        self.sprites = pygame.sprite.Group()
+        self.walls = pygame.sprite.Group()
 
         self.sprites.add(self.player)
         self.sprites.add(self.platform)
-        self.sprites.add(p1)
 
-        self.platforms.add(p1)
-        self.platforms.add(self.platform)
+        self.las_position_wall = WIDHT + 200
+
+        self.generate_walls()
+
+    def generate_walls(self):
+        if len(self.walls) < 6:
+
+            pos_x = random.randrange(self.las_position_wall + 200,
+                                     self.las_position_wall + 500)
+
+            wall = Wall(pos_x, self.platform.rect.top)
+
+            self.sprites.add(wall)
+            self.walls.add(wall)
+            self.las_position_wall = wall.rect.right
+
+
+    def fonts(self):
+        font = pygame.font.match_font('arial')
+        self.font = pygame.font.Font(font, 28)
 
     def run(self):
         while self.playing:
@@ -47,6 +68,8 @@ class Game:
 
     def draw(self):
         self.display.fill(BLACK)
+        self.display.blit(self.text, self.text_rect)
+
         self.sprites.draw(self.display)
 
         pygame.display.update()
@@ -58,26 +81,39 @@ class Game:
 
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.player.left()
-
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.player.right()
-
         if keys[pygame.K_SPACE]:
             self.player.jump()
 
     def update(self):
-
         self.sprites.update()
 
-        if self.player.is_falling():
-            self.player.validate_landing(self.platforms)
+        self.player.validate_landing(self.platform)
 
-        self.player.validate_border()
-        self.player.validate_jump(self.platforms)
+        self.monitor_walls()
+        self.update_text()
 
-        if self.player.is_running():
-            self.player.validate_acc_x(self.platforms)
+        self.generate_walls()
 
-        
+
+    def monitor_walls(self):
+        for wall in self.walls:
+            if not wall.jumped and self.player.pass_wall(wall):
+                self.update_score()
+                wall.jumped = True
+
+            if wall.rect.left <= -10:
+                wall.kill()
+
+    def update_score(self):
+        self.score += 1
+
+    def score_text(self):
+        return "Score : {} ".format(self.score)
+
+    def update_text(self):
+        self.text = self.font.render(self.score_text(), True, WHITE)
+        self.text_rect = self.text.get_rect()
+        self.text_rect.midtop = (WIDHT / 2, 10)
+
+    def stop(self):
+        pass
