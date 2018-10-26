@@ -1,3 +1,4 @@
+import os
 import pygame
 import random
 
@@ -19,18 +20,25 @@ class Game:
 
         self.running = True
         self.score = 0
-        self.vel_x = WALL_SPEED
+
+        self.font = pygame.font.match_font('arial')
+
+        self.dir = os.path.dirname(__file__)
+        self.sound_dir = os.path.join(self.dir, 'sources/sounds')
+
+    def start(self):
+        self.menu()
+        self.new()
 
     def new(self):
         self.playing = True
+        self.level = 1
+        self.vel_x = WALL_SPEED
 
         self.generate_elements()
         self.run()
 
     def generate_elements(self):
-        self.generate_fonts()
-        self.update_text()
-
         self.platform = Platform()
         self.player = Player(100, self.platform.rect.top - 200)
 
@@ -70,12 +78,6 @@ class Game:
             self.walls.add(wall)
             self.las_position_wall = wall.rect.right
 
-    def generate_fonts(self):
-        font = pygame.font.match_font('arial')
-
-        self.score_font = pygame.font.Font(font, 28)
-        self.final_font = pygame.font.Font(font, 36)
-
     def run(self):
         while self.running:
             self.clock.tick(FPS)
@@ -85,11 +87,20 @@ class Game:
 
     def draw(self):
         self.display.fill(BLACK)
-        self.display.blit(self.text, self.text_rect)
 
         self.sprites.draw(self.display)
+        self.update_text()
 
         pygame.display.update()
+
+    def draw_text(self, text, font_size, color, pos_x, pos_y):
+        font = pygame.font.Font(self.font, font_size)
+
+        text = font.render(text, True, color)
+        rect = text.get_rect()
+        rect.midtop = (pos_x, pos_y)
+
+        self.display.blit(text, rect)
 
     def events(self):
         for event in pygame.event.get():
@@ -107,7 +118,6 @@ class Game:
 
         self.player.validate_platform(self.platform)
 
-        self.update_text()
         self.update_elements(self.walls)
         self.update_elements(self.coins)
 
@@ -136,20 +146,14 @@ class Game:
     def update_score(self, points=1):
         self.score += points
 
-    def update_text_score(self):
-        return self.score_font.render(self.score_text(), True, WHITE)
-
     def update_text_final(self):
         return self.final_font.render("Perdiste!!", True, RED)
 
     def update_text(self):
         if self.playing:
-            self.text = self.update_text_score()
+            self.draw_text(self.score_text(), 30, WHITE, WIDHT / 2, HEIGHT / 2)
         else:
-            self.text = self.update_text_final()
-
-        self.text_rect = self.text.get_rect()
-        self.text_rect.midtop = (WIDHT / 2, 10)
+            self.draw_text('Perdiste!!!', 30, RED, WIDHT / 2, 100)
 
     def score_text(self):
         return "Score : {} ".format(self.score)
@@ -158,3 +162,31 @@ class Game:
         self.vel_x = 0
         self.playing = False
         self.player.stop()
+
+    def menu(self):
+        pygame.mixer.music.load(os.path.join(self.sound_dir, 'Haggstrom.mp3'))
+        pygame.mixer.music.play(loops=-1)
+
+        self.display.fill(BLUE_LIGTH)
+
+        self.draw_text('Press a key to play', 36, BLACK, WIDHT / 2, HEIGHT * 3 / 4)
+
+        pygame.display.flip()
+
+        self.wait()
+
+        pygame.mixer.music.fadeout(500)
+
+    def wait(self):
+        wait = True
+
+        while wait:
+            self.clock.tick(FPS)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    wait = False
+                    self.running = False
+
+                if event.type == pygame.KEYUP:
+                    wait = False
