@@ -10,9 +10,9 @@ class Element(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.left -= self.vel_x
-        
+
     def set_vel_x(self, vel_x):
         self.vel_x = vel_x
 
     def visible(self):
-        return self.rect.right > 0
+        return self.rect.right > 0 

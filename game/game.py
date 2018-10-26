@@ -19,21 +19,23 @@ class Game:
         self.clock =  pygame.time.Clock()
 
         self.running = True
-        self.score = 0
 
-        self.font = pygame.font.match_font('arial')
+        self.font = pygame.font.match_font(FONT)
 
         self.dir = os.path.dirname(__file__)
         self.sound_dir = os.path.join(self.dir, 'sources/sounds')
+        self.image_dir = os.path.join(self.dir, 'sources/images')
 
     def start(self):
         self.menu()
         self.new()
 
     def new(self):
-        self.playing = True
+        self.score = 0
         self.level = 1
         self.vel_x = WALL_SPEED
+        self.playing = True
+        self.win = False
 
         self.generate_elements()
         self.run()
@@ -49,34 +51,41 @@ class Game:
         self.sprites.add(self.player)
         self.sprites.add(self.platform)
 
-        self.las_position_wall = WIDHT + 200
-        self.las_position_coin = WIDHT + 100
-
         self.generate_walls()
         self.generate_coins()
 
-    def generate_coins(self):
-        if len(self.coins) < 10:
+    def generate_walls(self):
+        las_position = WIDHT + 100
 
-            pos_x = random.randrange(self.las_position_coin + 200,
-                                     self.las_position_coin + 400)
+        if not self.exists_walls():
+
+            for w in range(0, MAX_WALLS):
+
+                pos_x = random.randrange(las_position + 100, las_position + 400)
+
+                wall = Wall(pos_x, self.platform.rect.top)
+
+                self.sprites.add(wall)
+                self.walls.add(wall)
+
+                las_position = wall.rect.right
+
+    def generate_coins(self):
+        las_position = WIDHT + 100
+
+        for w in range(0, MAX_COINS):
+
+            pos_x = random.randrange(las_position + 100, las_position + 300)
+
             coin = Coin(pos_x, 200)
 
             self.sprites.add(coin)
             self.coins.add(coin)
-            self.las_position_coin = coin.rect.right
 
-    def generate_walls(self):
-        if len(self.walls) < 6:
+            las_position = coin.rect.right
 
-            pos_x = random.randrange(self.las_position_wall + 200,
-                                     self.las_position_wall + 500)
-
-            wall = Wall(pos_x, self.platform.rect.top)
-
-            self.sprites.add(wall)
-            self.walls.add(wall)
-            self.las_position_wall = wall.rect.right
+    def exists_walls(self):
+        return len(self.walls) > 0
 
     def run(self):
         while self.running:
@@ -87,17 +96,22 @@ class Game:
 
     def draw(self):
         self.display.fill(BLACK)
+        self.sprites.draw(self.display)
 
         self.draw_text()
-        self.sprites.draw(self.display)
 
         pygame.display.flip()
 
     def draw_text(self):
-        if self.playing:
-            self.display_text(self.score_text(), 30, WHITE, WIDHT / 2,10)
+        if self.playing or self.win:
+            self.display_text(self.score_format(), 30, WHITE, WIDHT / 2,10)
+            self.display_text(self.level_format(), 30, WHITE, 60, 10)
         else:
-            self.display_text('Perdiste!!!', 30, RED, WIDHT / 2, 10)
+            self.display_text('Perdistes!', 30, RED, WIDHT / 2, 10)
+            self.display_text('Presiona r para comenzar de nuevo', 25, WHITE, WIDHT / 2, 30)
+
+        if self.win:
+            self.display_text('Feliciades!!!', 50, RED, WIDHT / 2, HEIGHT / 2)
 
     def display_text(self, text, font_size, color, pos_x, pos_y):
         font = pygame.font.Font(self.font, font_size)
@@ -119,7 +133,13 @@ class Game:
         if keys[pygame.K_SPACE]:
             self.player.jump()
 
+        if keys[pygame.K_r] and not self.playing:
+            self.new()
+
     def update(self):
+        if not self.playing:
+            return
+
         self.sprites.update()
 
         self.player.validate_platform(self.platform)
@@ -129,7 +149,7 @@ class Game:
 
         coin = self.player.collide_with(self.coins)
         if coin:
-            self.update_score(coin.points)
+            self.increment_score(coin.points)
             coin.kill()
 
         wall = self.player.collide_with(self.walls)
@@ -139,8 +159,11 @@ class Game:
             else:
                 self.stop()
 
-        self.generate_walls()
-        self.generate_coins()
+        self.change_next_level()
+
+        if self.final_level():
+            self.win = True
+            self.stop()
 
     def update_elements(self, elements):
         for element in elements:
@@ -149,14 +172,27 @@ class Game:
             if not element.visible():
                 element.kill()
 
-    def update_score(self, points=1):
+    def increment_score(self, points=1):
         self.score += points
 
-    def update_text_final(self):
-        return self.final_font.render("Perdiste!!", True, RED)
+    def change_next_level(self):
+        if not self.exists_walls():
+            self.next_level()
+            self.generate_walls()
+            self.generate_coins()
 
-    def score_text(self):
+    def final_level(self):
+        return self.level == FINAL_LEVEL
+
+    def next_level(self):
+        self.level += 1
+        self.vel_x += 1
+
+    def score_format(self):
         return "Score : {} ".format(self.score)
+
+    def level_format(self):
+        return "Level : {} ".format(self.level)
 
     def stop(self):
         self.vel_x = 0
@@ -169,8 +205,8 @@ class Game:
 
         self.display.fill(BLUE_LIGTH)
 
-        self.display_text('Facilito Game', 40, BLACK, WIDHT / 2, 50)
-        self.display_text('Press a key to play', 36, BLACK, WIDHT / 2, HEIGHT * 3 / 4)
+        self.display_text('FacilitoGames', 40, BLACK, WIDHT / 2, 50)
+        self.display_text('Presiona una tecla para comenzar', 36, BLACK, WIDHT / 2, 300)
 
         pygame.display.flip()
 

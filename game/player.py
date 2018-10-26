@@ -15,15 +15,14 @@ class Player(pygame.sprite.Sprite):
 
         self.vel_y = 0
         self.pos_y = self.rect.bottom
-        self.acc_y = PLAYER_GRAV
-
+        
         self.can_jump = False
         self.jumpping = False
         self.playing = True
 
     def jump(self):
         if self.can_jump:
-            self.vel_y = -25
+            self.vel_y = PLAYER_VEL_Y
             self.jumpping = True
             self.can_jump = False
 
@@ -52,8 +51,8 @@ class Player(pygame.sprite.Sprite):
         self.playing = False
 
     def update_pos(self):
-        self.vel_y += self.acc_y #always falling
-        self.pos_y += self.vel_y + 0.5 * self.acc_y
+        self.vel_y += PLAYER_GRAV #always falling
+        self.pos_y += self.vel_y + 0.5 * PLAYER_GRAV
 
     def update(self):
         if self.playing:
