@@ -110,16 +110,16 @@ class Game:
 
         coin = self.player.collide_with(self.coins)
         if coin:
-            self.update_score()
+            self.update_score(coin.points)
             coin.kill()
 
         wall = self.player.collide_with(self.walls)
         if wall:
-            if not self.player.collide_bottom(wall):
+            if self.player.collide_bottom(wall):
+                self.player.skid(wall)
+            else:
                 self.stop()
-
-            self.player.skid(wall)
-
+                
         self.generate_walls()
         self.generate_coins()
 
@@ -130,8 +130,8 @@ class Game:
             if not element.visible():
                 element.kill()
 
-    def update_score(self):
-        self.score += 1
+    def update_score(self, points=1):
+        self.score += points
 
     def update_text(self):
         self.text = self.font.render(self.score_text(), True, WHITE)

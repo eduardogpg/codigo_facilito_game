@@ -41,16 +41,13 @@ class Player(pygame.sprite.Sprite):
             return hits[0]
 
     def collide_bottom(self, wall):
-        self.rect.x -= 1
-        collide = pygame.sprite.collide_rect(self, wall)
-        self.rect.x += 1
-
-        return collide
+        return self.rect.colliderect(wall.surface)
 
     def skid(self, wall):
         self.pos_y = wall.rect.top
         self.vel_y = 0
-        
+        self.can_jump = True
+
     def stop(self):
         self.playing = False
 

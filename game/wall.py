@@ -13,3 +13,11 @@ class Wall(Element):
         self.rect = self.image.get_rect()
         self.rect.x = pos_x
         self.rect.y = pos_y - 100
+
+        self.surface = pygame.Rect(self.rect.x, self.rect.y, self.rect.width, 1)
+
+    def update(self):
+        Element.update(self)
+        
+        self.surface.x = self.rect.x
+        self.surface.y = self.rect.y
