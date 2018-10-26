@@ -88,12 +88,18 @@ class Game:
     def draw(self):
         self.display.fill(BLACK)
 
+        self.draw_text()
         self.sprites.draw(self.display)
-        self.update_text()
 
-        pygame.display.update()
+        pygame.display.flip()
 
-    def draw_text(self, text, font_size, color, pos_x, pos_y):
+    def draw_text(self):
+        if self.playing:
+            self.display_text(self.score_text(), 30, WHITE, WIDHT / 2,10)
+        else:
+            self.display_text('Perdiste!!!', 30, RED, WIDHT / 2, 10)
+
+    def display_text(self, text, font_size, color, pos_x, pos_y):
         font = pygame.font.Font(self.font, font_size)
 
         text = font.render(text, True, color)
@@ -149,12 +155,6 @@ class Game:
     def update_text_final(self):
         return self.final_font.render("Perdiste!!", True, RED)
 
-    def update_text(self):
-        if self.playing:
-            self.draw_text(self.score_text(), 30, WHITE, WIDHT / 2, HEIGHT / 2)
-        else:
-            self.draw_text('Perdiste!!!', 30, RED, WIDHT / 2, 100)
-
     def score_text(self):
         return "Score : {} ".format(self.score)
 
@@ -169,13 +169,14 @@ class Game:
 
         self.display.fill(BLUE_LIGTH)
 
-        self.draw_text('Press a key to play', 36, BLACK, WIDHT / 2, HEIGHT * 3 / 4)
+        self.display_text('Facilito Game', 40, BLACK, WIDHT / 2, 50)
+        self.display_text('Press a key to play', 36, BLACK, WIDHT / 2, HEIGHT * 3 / 4)
 
         pygame.display.flip()
 
         self.wait()
 
-        pygame.mixer.music.fadeout(500)
+        pygame.mixer.music.fadeout(1000)
 
     def wait(self):
         wait = True
