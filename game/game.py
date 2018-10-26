@@ -72,10 +72,12 @@ class Game:
 
     def generate_fonts(self):
         font = pygame.font.match_font('arial')
-        self.font = pygame.font.Font(font, 28)
+
+        self.score_font = pygame.font.Font(font, 28)
+        self.final_font = pygame.font.Font(font, 36)
 
     def run(self):
-        while self.playing:
+        while self.running:
             self.clock.tick(FPS)
             self.events()
             self.update()
@@ -93,6 +95,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
+                self.running = False
 
         keys = pygame.key.get_pressed()
 
@@ -119,7 +122,7 @@ class Game:
                 self.player.skid(wall)
             else:
                 self.stop()
-                
+
         self.generate_walls()
         self.generate_coins()
 
@@ -133,8 +136,17 @@ class Game:
     def update_score(self, points=1):
         self.score += points
 
+    def update_text_score(self):
+        return self.score_font.render(self.score_text(), True, WHITE)
+
+    def update_text_final(self):
+        return self.final_font.render("Perdiste!!", True, RED)
+
     def update_text(self):
-        self.text = self.font.render(self.score_text(), True, WHITE)
+        if self.playing:
+            self.text = self.update_text_score()
+        else:
+            self.text = self.update_text_final()
 
         self.text_rect = self.text.get_rect()
         self.text_rect.midtop = (WIDHT / 2, 10)
@@ -144,4 +156,5 @@ class Game:
 
     def stop(self):
         self.vel_x = 0
+        self.playing = False
         self.player.stop()
