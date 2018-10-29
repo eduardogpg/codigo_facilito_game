@@ -103,15 +103,17 @@ class Game:
         pygame.display.flip()
 
     def draw_text(self):
-        if self.playing or self.win:
-            self.display_text(self.score_format(), 30, WHITE, WIDHT / 2,10)
-            self.display_text(self.level_format(), 30, WHITE, 60, 10)
-        else:
-            self.display_text('Perdistes!', 30, RED, WIDHT / 2, 10)
+        self.display_text(self.score_format(), 30, WHITE, WIDHT / 2,10)
+        self.display_text(self.level_format(), 30, WHITE, 60, 10)
+
+        if not self.playing:
+
             self.display_text('Presiona r para comenzar de nuevo', 25, WHITE, WIDHT / 2, 30)
 
-        if self.win:
-            self.display_text('Feliciades!!!', 50, RED, WIDHT / 2, HEIGHT / 2)
+            if self.win:
+                self.display_text('Felicidades!!!', 50, RED, WIDHT / 2, HEIGHT / 2)
+            else:
+                self.display_text('Perdiste!!!', 50, RED, WIDHT / 2, HEIGHT / 2)
 
     def display_text(self, text, font_size, color, pos_x, pos_y):
         font = pygame.font.Font(self.font, font_size)
@@ -140,6 +142,8 @@ class Game:
         if not self.playing:
             return
 
+        print(pygame.time.get_ticks())
+
         self.sprites.update()
 
         self.player.validate_platform(self.platform)
@@ -151,6 +155,7 @@ class Game:
         if coin:
             self.increment_score(coin.points)
             coin.kill()
+            pygame.mixer.Sound(os.path.join(self.sound_dir, 'coin.wav')).play()
 
         wall = self.player.collide_with(self.walls)
         if wall:
@@ -197,18 +202,21 @@ class Game:
     def stop(self):
         self.vel_x = 0
         self.playing = False
+
+        pygame.mixer.Sound(os.path.join(self.sound_dir, 'lose.wav')).play()
+
         self.player.stop()
 
     def menu(self):
-        pygame.mixer.music.load(os.path.join(self.sound_dir, 'Haggstrom.mp3'))
-        pygame.mixer.music.play(loops=-1)
+        #pygame.mixer.music.load(os.path.join(self.sound_dir, 'Haggstrom.mp3'))
+        #pygame.mixer.music.play(loops=-1)
 
         self.display.fill(BLUE_LIGTH)
 
         self.display_text('FacilitoGames', 40, BLACK, WIDHT / 2, 50)
         self.display_text('Presiona una tecla para comenzar', 36, BLACK, WIDHT / 2, 300)
 
-        pygame.display.flip()
+        #pygame.display.flip()
 
         self.wait()
 
