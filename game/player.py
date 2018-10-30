@@ -1,13 +1,18 @@
+import os
 import pygame
+
 from pygame.math import Vector2 as vector
 from .config import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, left, bottom):
+    def __init__(self, left, bottom, sprite_dir):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.Surface( (40, 40) )
-        self.image.fill(BLUE)
+        self.images = ( pygame.image.load(os.path.join(sprite_dir, 'player1.png')),
+                        pygame.image.load(os.path.join(sprite_dir, 'jump.png'))
+                       )
+
+        self.image = self.images[0]
 
         self.rect = self.image.get_rect()
         self.rect.left = left
@@ -15,7 +20,7 @@ class Player(pygame.sprite.Sprite):
 
         self.vel_y = 0
         self.pos_y = self.rect.bottom
-        
+
         self.can_jump = False
         self.jumpping = False
         self.playing = True
@@ -33,6 +38,7 @@ class Player(pygame.sprite.Sprite):
             self.pos_y = platform.rect.top
             self.can_jump = True
             self.jumpping = False
+            self.image = self.images[0]
 
     def collide_with(self, sprites):
         hits = pygame.sprite.spritecollide(self, sprites, False)
@@ -46,6 +52,7 @@ class Player(pygame.sprite.Sprite):
         self.pos_y = wall.rect.top
         self.vel_y = 0
         self.can_jump = True
+        self.image = self.images[0]
 
     def stop(self):
         self.playing = False
@@ -53,6 +60,9 @@ class Player(pygame.sprite.Sprite):
     def update_pos(self):
         self.vel_y += PLAYER_GRAV #always falling
         self.pos_y += self.vel_y + 0.5 * PLAYER_GRAV
+
+        if not self.can_jump:
+            self.image = self.images[1]
 
     def update(self):
         if self.playing:
