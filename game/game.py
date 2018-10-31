@@ -151,7 +151,7 @@ class Game:
         self.update_elements(self.walls)
         self.update_elements(self.coins)
 
-        coin = self.player.collide_with(self.coins)
+        coin = self.player.collide_with_mask(self.coins)
         if coin:
             self.increment_score(coin.points)
             coin.kill()

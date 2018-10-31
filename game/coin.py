@@ -14,7 +14,12 @@ class Coin(Element):
         self.rect = self.image.get_rect()
         self.rect.x = pos_x
         self.rect.y = pos_y - 40
-        
+
         self.vel_x = 0
 
         self.points = 1
+
+    def update(self):
+        self.mask = pygame.mask.from_surface(self.image)
+
+        Element.update(self)

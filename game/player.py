@@ -45,6 +45,11 @@ class Player(pygame.sprite.Sprite):
         if hits:
             return hits[0]
 
+    def collide_with_mask(self, sprites):
+        hits = pygame.sprite.spritecollide(self, sprites, False, pygame.sprite.collide_mask)
+        if hits:
+            return hits[0]
+
     def collide_bottom(self, wall):
         return self.rect.colliderect(wall.surface)
 
@@ -66,5 +71,8 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         if self.playing:
+
+            self.mask = pygame.mask.from_surface(self.image)
+
             self.update_pos()
             self.rect.bottom = self.pos_y
